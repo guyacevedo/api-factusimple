@@ -42,6 +42,14 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error("No autenticado", "UNAUTHENTICATED", null));
     }
 
+    @ExceptionHandler(io.github.resilience4j.circuitbreaker.CallNotPermittedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleCircuitOpen(
+            io.github.resilience4j.circuitbreaker.CallNotPermittedException ex) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(ApiResponse.error("Servicio de facturación no disponible temporalmente",
+                        "FACTUS_CIRCUIT_OPEN", null));
+    }
+
     @ExceptionHandler(io.github.resilience4j.ratelimiter.RequestNotPermitted.class)
     public ResponseEntity<ApiResponse<Object>> handleRateLimit(
             io.github.resilience4j.ratelimiter.RequestNotPermitted ex) {
