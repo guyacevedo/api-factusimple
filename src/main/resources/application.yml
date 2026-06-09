@@ -44,6 +44,9 @@ app:
     encryption-key: ${ENCRYPTION_KEY:change-me-base64-encoded-32-bytes-key-replace==}
   cors:
     allowed-origins: ${ALLOWED_ORIGINS:http://localhost:4200}
+  lockout:
+    max-attempts: 10
+    duration: PT15M
 
 # Integración con el proveedor Factus (sandbox siempre)
 factus:
@@ -76,3 +79,8 @@ resilience4j:
         limit-for-period: 70
         limit-refresh-period: PT1M
         timeout-duration: PT2S
+      auth-login:
+        # Protección de fuerza bruta en el login.
+        limit-for-period: 10
+        limit-refresh-period: PT1M
+        timeout-duration: 0
