@@ -1,0 +1,38 @@
+# ── Java / Maven ──────────────────────────────────────────────
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+*.class
+*.jar
+*.war
+*.ear
+hs_err_pid*
+replay_pid*
+
+# ── Spring Boot ───────────────────────────────────────────────
+*.log
+logs/
+
+# ── Secretos / entorno ────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# ── IDE ───────────────────────────────────────────────────────
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+nbproject/private/
+
+# ── SO ────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db

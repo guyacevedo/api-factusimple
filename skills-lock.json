@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "skills": {
+    "agent-browser": {
+      "source": "vercel-labs/agent-browser",
+      "sourceType": "github",
+      "skillPath": "skills/agent-browser/SKILL.md",
+      "computedHash": "228f87d57035100d9dc6efcfc05aafd4b6e3962adacaa04b8217ab2fadb15dc8"
+    },
+    "docker-expert": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "skillPath": "skills/docker-expert/SKILL.md",
+      "computedHash": "0974b5f64fcd284c1bd662810e2388f7beb9be6784c597de4d0ad4213ccbd6af"
+    },
+    "flyway-migrations": {
+      "source": "ashchupliak/dream-team",
+      "sourceType": "github",
+      "skillPath": "skills/flyway-migrations/SKILL.md",
+      "computedHash": "bc370969882fc6739de06be064cf539edf5b4d25a3df9697a5dd19c46743a4e5"
+    },
+    "grill-me": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/productivity/grill-me/SKILL.md",
+      "computedHash": "784f0dbb7403b0f00324bce9a112f715342777a0daee7bbb7385f9c6f0a170ea"
+    },
+    "java-springboot": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "skillPath": "skills/java-springboot/SKILL.md",
+      "computedHash": "f1b9c6b1277178fc33e5a612761c1cd1cf6ab5f946d05d69d52026d142c0a0c1"
+    },
+    "postgresql-optimization": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "skillPath": "skills/postgresql-optimization/SKILL.md",
+      "computedHash": "8022448de70ba9a485e3b5bce34c5bbc644f93eb39b68431c9f7dabcf03aeb09"
+    },
+    "spring-boot-engineer": {
+      "source": "jeffallan/claude-skills",
+      "sourceType": "github",
+      "skillPath": "skills/spring-boot-engineer/SKILL.md",
+      "computedHash": "ed065f5db45afe9dc2739cff713927d0b6b6ad3e667bdf7b40340d1a5543bb0f"
+    },
+    "spring-boot-openapi-documentation": {
+      "source": "giuseppe-trisciuoglio/developer-kit",
+      "sourceType": "github",
+      "skillPath": "plugins/developer-kit-java/skills/spring-boot-openapi-documentation/SKILL.md",
+      "computedHash": "b05be6d8a048c33e6ff3f8740a776d3cd31568ef9aad8265a41455ace989718f"
+    },
+    "spring-boot-resilience4j": {
+      "source": "giuseppe-trisciuoglio/developer-kit",
+      "sourceType": "github",
+      "skillPath": "plugins/developer-kit-java/skills/spring-boot-resilience4j/SKILL.md",
+      "computedHash": "4083c0dc19a02e598b1703d1e9b3fcf29b69cf306712157599bba5a9730a7906"
+    },
+    "spring-boot-security-jwt": {
+      "source": "giuseppe-trisciuoglio/developer-kit",
+      "sourceType": "github",
+      "skillPath": "plugins/developer-kit-java/skills/spring-boot-security-jwt/SKILL.md",
+      "computedHash": "ed40cb6fd4928fe83151c1cfad59e37afcf1557d7b31247c4d09022e9159ef53"
+    }
+  }
+}
