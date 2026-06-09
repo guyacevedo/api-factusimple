@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_DATABASE_NAME:factusimple_test}
+  flyway:
+    enabled: true
+
+logging:
+  level:
+    root: WARN
+
+app:
+  security:
+    jwt:
+      secret: test-secret-key-min-32-chars-long-for-testing-only
+    encryption-key: dGVzdC1lbmNyeXB0aW9uLWtleS0zMi1ieXRlcy0wMDA=

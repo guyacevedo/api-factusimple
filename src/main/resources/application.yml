@@ -1,0 +1,78 @@
+spring:
+  application:
+    name: api-factusimple
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_DATABASE_NAME:factusimple}
+    username: ${DB_USER:factusimple}
+    password: ${DB_PASSWORD:factusimple}
+  jpa:
+    open-in-view: false
+    hibernate:
+      # La BD la gobierna Flyway: DDL siempre 'none'.
+      ddl-auto: none
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+server:
+  port: ${PORT:8090}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+# Configuración de la plataforma
+app:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:change-me-min-32-chars-long-secret-key-here-replace}
+      access-token-ttl: PT24H
+      refresh-token-ttl: P30D
+    encryption-key: ${ENCRYPTION_KEY:change-me-base64-encoded-32-bytes-key-replace==}
+  cors:
+    allowed-origins: ${ALLOWED_ORIGINS:http://localhost:4200}
+
+# Integración con el proveedor Factus (sandbox siempre)
+factus:
+  endpoint: ${FACTUS_ENDPOINT_SANDBOX:https://api-sandbox.factus.com.co}
+  user: ${FACTUS_USER:}
+  password: ${FACTUS_PASSWORD:}
+  client-id: ${FACTUS_CLIENT_ID:}
+  client-secret: ${FACTUS_CLIENT_SECRET:}
+  connect-timeout: PT5S
+  read-timeout: PT30S
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      factus:
+        sliding-window-size: 20
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: PT30S
+        permitted-number-of-calls-in-half-open-state: 5
+  retry:
+    instances:
+      factus:
+        max-attempts: 3
+        wait-duration: PT1S
+        enable-exponential-backoff: true
+  ratelimiter:
+    instances:
+      factus:
+        # Factus permite 80 req/min por usuario.
+        limit-for-period: 70
+        limit-refresh-period: PT1M
+        timeout-duration: PT2S
