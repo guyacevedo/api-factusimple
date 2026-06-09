@@ -2,10 +2,19 @@ package com.factusimple.establishment.mapper;
 
 import com.factusimple.establishment.dto.EstablishmentDtos.Response;
 import com.factusimple.establishment.entity.Establishment;
-import org.mapstruct.Mapper;
+import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring")
-public interface EstablishmentMapper {
+/** Mapeo Establishment -> DTO (manual; ver nota en notas técnicas sobre MapStruct/JDK 24). */
+@Component
+public class EstablishmentMapper {
 
-    Response toResponse(Establishment establishment);
+    public Response toResponse(Establishment e) {
+        if (e == null) {
+            return null;
+        }
+        return new Response(
+                e.getId(), e.getName(), e.getIdentification(), e.getDv(),
+                e.getAddress(), e.getPhone(), e.getEmail(),
+                e.getMunicipalityCode(), e.getNumberingRangeId());
+    }
 }
