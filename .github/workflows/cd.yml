@@ -1,0 +1,80 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image_ref: ${{ steps.meta.outputs.image_ref }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login en GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Definir tag de imagen
+        id: meta
+        run: echo "image_ref=${IMAGE,,}:${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - name: Build + push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.image_ref }}
+            ${{ env.IMAGE }}:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy por SSH (con health-check y rollback)
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -e
+            cd ~/api-factusimple
+            # Guardar imagen previa para rollback.
+            PREV=$(grep '^API_IMAGE=' .env | cut -d= -f2 || true)
+            echo "Imagen previa: ${PREV:-ninguna}"
+            # Apuntar a la nueva imagen y desplegar.
+            sed -i "s#^API_IMAGE=.*#API_IMAGE=${{ needs.build-and-push.outputs.image_ref }}#" .env
+            docker compose -f docker-compose.prod.yml pull api
+            # Flyway corre al arrancar la app (validación de checksums en prod).
+            docker compose -f docker-compose.prod.yml up -d
+            # Health-check con reintentos.
+            for i in $(seq 1 24); do
+              if docker compose -f docker-compose.prod.yml exec -T api \
+                   wget -qO- http://localhost:8090/actuator/health | grep -q UP; then
+                echo "Despliegue saludable"; exit 0
+              fi
+              sleep 5
+            done
+            echo "Health-check falló: rollback a ${PREV}"
+            if [ -n "$PREV" ]; then
+              sed -i "s#^API_IMAGE=.*#API_IMAGE=${PREV}#" .env
+              docker compose -f docker-compose.prod.yml up -d
+            fi
+            exit 1

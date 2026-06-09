@@ -1,0 +1,37 @@
+name: Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_ref:
+        description: "Imagen a desplegar (ghcr.io/owner/repo:tag)"
+        required: true
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Desplegar imagen indicada por SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -e
+            cd ~/api-factusimple
+            sed -i "s#^API_IMAGE=.*#API_IMAGE=${{ github.event.inputs.image_ref }}#" .env
+            docker compose -f docker-compose.prod.yml pull api
+            docker compose -f docker-compose.prod.yml up -d
+            for i in $(seq 1 24); do
+              if docker compose -f docker-compose.prod.yml exec -T api \
+                   wget -qO- http://localhost:8090/actuator/health | grep -q UP; then
+                echo "Rollback saludable"; exit 0
+              fi
+              sleep 5
+            done
+            echo "Health-check falló tras el rollback"; exit 1

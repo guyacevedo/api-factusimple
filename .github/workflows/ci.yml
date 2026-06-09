@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: factusimple_test
+          POSTGRES_USER: factusimple
+          POSTGRES_PASSWORD: factusimple
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U factusimple"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Build + tests (verify)
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_DATABASE_NAME: factusimple_test
+          DB_USER: factusimple
+          DB_PASSWORD: factusimple
+        run: ./mvnw -B clean verify

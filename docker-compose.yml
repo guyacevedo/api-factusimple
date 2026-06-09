@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${DB_DATABASE_NAME:-factusimple}
+      POSTGRES_USER: ${DB_USER:-factusimple}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-factusimple}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-factusimple}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE_NAME: ${DB_DATABASE_NAME:-factusimple}
+      DB_USER: ${DB_USER:-factusimple}
+      DB_PASSWORD: ${DB_PASSWORD:-factusimple}
+      JWT_SECRET: ${JWT_SECRET}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:4200}
+      FACTUS_ENDPOINT_SANDBOX: ${FACTUS_ENDPOINT_SANDBOX:-https://api-sandbox.factus.com.co}
+      FACTUS_USER: ${FACTUS_USER}
+      FACTUS_PASSWORD: ${FACTUS_PASSWORD}
+      FACTUS_CLIENT_ID: ${FACTUS_CLIENT_ID}
+      FACTUS_CLIENT_SECRET: ${FACTUS_CLIENT_SECRET}
+    ports:
+      - "8090:8090"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8090/actuator/health | grep -q UP || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  db-data:
